@@ -16,7 +16,7 @@ import Grid from '@mui/material/Grid2';
 
 import './App.css';
 
-function App() {
+function Charts() {
   const [count, setCount] = useState(0);
   const [results, setResults] = useState([]);
   const mean =
@@ -150,4 +150,4 @@ function App() {
   );
 }
 
-export default App;
+export default Charts;

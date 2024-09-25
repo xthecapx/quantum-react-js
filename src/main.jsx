@@ -1,31 +1,24 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App.jsx';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import Charts from './Charts.jsx';
+import { createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import './index.css';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import DescriptionIcon from '@mui/icons-material/Description';
-import LayersIcon from '@mui/icons-material/Layers';
+import PercentIcon from '@mui/icons-material/Percent';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-
-
+import HomeIcon from '@mui/icons-material/Home';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
-import Home from './Home.jsx';
+import CHSH from './CHSH.jsx';
 
 const router = createHashRouter([
   {
     path: '/',
-    element: <App />,
+    element: <CHSH />,
   },
   {
     path: '/charts',
-    element: <Home />,
+    element: <Charts />,
   },
 ]);
 
@@ -41,12 +34,16 @@ const NAVIGATION = [
     title: 'Main items',
   },
   {
-    segment: 'dashboard',
-    title: 'Dashboard',
-    icon: <DashboardIcon />,
+    segment: '',
+    title: 'Home',
+    icon: <HomeIcon />,
+  },
+  {
+    segment: 'CHSH Game',
+    title: 'Charts',
+    icon: <PercentIcon />,
   },
 ];
-
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -54,7 +51,7 @@ createRoot(document.getElementById('root')).render(
       navigation={NAVIGATION}
       router={router}
       theme={darkTheme}
-      window={window !== undefined ? window() : undefined}
+      window={window !== undefined ? window : undefined}
       >
       <DashboardLayout>
         <CssBaseline />

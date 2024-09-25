@@ -15,9 +15,9 @@
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
-    "@mui/icons-material": "^6.1.1",
     "@mui/material": "^6.1.1",
     "@mui/x-charts": "^7.18.0",
+    "@toolpad/core": "^0.7.0",
     "quantum-circuit": "^0.9.224",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

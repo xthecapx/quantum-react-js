@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid2';
 import { generateQuestions, validateGame } from './utils/game.js';
 
-function Home() {
+function CHSH() {
   const [a, setA] = useState(null);
   const [b, setB] = useState(null);
   const [x, setX] = useState(null);
@@ -112,4 +112,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default CHSH;
