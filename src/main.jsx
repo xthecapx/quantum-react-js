@@ -11,6 +11,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import CHSH from './CHSH.jsx';
 import QuantumTeleportationDemo from './QuantumTeleportationDemo.jsx';
+import ComparisonChart from './ComparisonChart.jsx';
 
 const router = createHashRouter([
   {
@@ -25,6 +26,10 @@ const router = createHashRouter([
     path: '/quantum-teleportation',
     element: <QuantumTeleportationDemo />,
   },
+  {
+    path: '/comparison',
+    element: <ComparisonChart />,
+  }
 ]);
 
 const darkTheme = createTheme({
@@ -51,6 +56,11 @@ const NAVIGATION = [
   {
     segment: 'quantum-teleportation',
     title: 'Quantum Teleportation',
+    icon: <PercentIcon />,
+  },
+  {
+    segment: 'comparison',
+    title: 'Comparison',
     icon: <PercentIcon />,
   },
 ];
