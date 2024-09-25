@@ -10,6 +10,7 @@ import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import HomeIcon from '@mui/icons-material/Home';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import CHSH from './CHSH.jsx';
+import QuantumTeleportationDemo from './QuantumTeleportationDemo.jsx';
 
 const router = createHashRouter([
   {
@@ -19,6 +20,10 @@ const router = createHashRouter([
   {
     path: '/charts',
     element: <Charts />,
+  },
+  {
+    path: '/quantum-teleportation',
+    element: <QuantumTeleportationDemo />,
   },
 ]);
 
@@ -39,8 +44,13 @@ const NAVIGATION = [
     icon: <HomeIcon />,
   },
   {
-    segment: 'CHSH Game',
+    segment: 'charts',
     title: 'Charts',
+    icon: <PercentIcon />,
+  },
+  {
+    segment: 'quantum-teleportation',
+    title: 'Quantum Teleportation',
     icon: <PercentIcon />,
   },
 ];
