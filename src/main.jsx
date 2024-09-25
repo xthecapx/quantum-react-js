@@ -10,6 +10,7 @@ import CHSH from './CHSH.jsx';
 import Charts from './Charts.jsx';
 import QuantumTeleportationDemo from './QuantumTeleportationDemo.jsx';
 import ComparisonChart from './ComparisonChart.jsx';
+import Home from './Home.jsx';
 
 // Import icons
 import HomeIcon from '@mui/icons-material/Home';
@@ -19,13 +20,6 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import CompareIcon from '@mui/icons-material/Compare';
 import ScienceIcon from '@mui/icons-material/Science';
 
-// Create a Home component
-const Home = () => (
-  <div>
-    <h1>Welcome to Quantum Playground</h1>
-    <p>This is an app to play with quantum concepts and experiments. Explore the different sections to learn about CHSH games, quantum teleportation, and more!</p>
-  </div>
-);
 
 const router = createHashRouter([
   {
@@ -58,13 +52,10 @@ const darkTheme = createTheme({
 
 const NAVIGATION = [
   {
-    kind: 'header',
-    title: 'Main items',
-  },
-  {
     segment: '',
     title: 'Home',
     icon: <HomeIcon />,
+    element: <Home />,
   },
   {
     segment: 'chsh',
@@ -109,7 +100,6 @@ createRoot(document.getElementById('root')).render(
       navigation={NAVIGATION}
       router={router}
       theme={darkTheme}
-      window={window !== undefined ? window : undefined}
     >
       <DashboardLayout>
         <CssBaseline />
