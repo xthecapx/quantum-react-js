@@ -1,71 +1,112 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { testQuantumTeleportation } from './utils/quantum-teleportation';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+  Paper,
+  Button,
+  TextField
+} from '@mui/material';
 
 const QuantumTeleportationDemo = () => {
+  const [repetitions, setRepetitions] = useState(1);
+  const [results, setResults] = useState([]);
   const [circuit, setCircuit] = useState(null);
-  const [step, setStep] = useState(0);
-  const [teleportationComplete, setTeleportationComplete] = useState(false);
+  const [angles, setAngles] = useState(null);
+  const svgContainerRef = useRef(null);
 
   useEffect(() => {
-    if (circuit) {
-      var container = document.getElementById("drawing");
-      var svg = circuit.exportSVG(true);
-      container.innerHTML = svg;
-      container.style.backgroundColor = 'white'; // Add this line to set the background color
+    const { circuit: newCircuit, angles: newAngles } = testQuantumTeleportation();
+    setCircuit(newCircuit);
+    setAngles(newAngles);
+  }, []);
+
+  useEffect(() => {
+    if (circuit && svgContainerRef.current) {
+      const svg = circuit.exportSVG(true);
+      const svgWithBackground = svg.replace('<svg', '<svg style="background-color: white;"');
+      svgContainerRef.current.innerHTML = svgWithBackground;
     }
   }, [circuit]);
 
-  const steps = [
-    "Let's start our quantum adventure!",
-    "Step 1: Prepare the quantum state to teleport",
-    "Step 2: Create entanglement between Bob and Alice",
-    "Step 3: Alice performs her quantum operations",
-    "Step 4: Alice measures her qubits and sends the results to Bob",
-    "Step 5: Bob applies corrections based on Alice's measurements",
-    "Teleportation complete! The quantum state has been teleported!"
-  ];
-
-  const handleNextStep = () => {
-    if (step < steps.length - 1) {
-      setStep(step + 1);
-      if (step === steps.length - 2) {
-        setTeleportationComplete(true);
-      }
+  const runTeleportation = () => {
+    const newResults = [];
+    for (let i = 0; i < repetitions; i++) {
+      const { circuit: newCircuit, angles: newAngles } = testQuantumTeleportation();
+      newCircuit.run();
+      newResults.push({
+        id: i + 1,
+        result: newCircuit.getCregBit('c2', 0),
+        u3: newAngles.u3,
+        u3Inverse: newAngles.u3Inverse
+      });
     }
+    setResults(newResults);
   };
 
-  const renderQubit = (qubitState, label) => (
-    <div className="qubit">
-      <div className={`qubit-circle ${qubitState}`}></div>
-      <div className="qubit-label">{label}</div>
-    </div>
-  );
+  const displayResults = results.length > 10
+    ? [...results.slice(0, 5), { id: '...', result: '...', u3: ['...', '...', '...'], u3Inverse: ['...', '...', '...'] }, ...results.slice(-5)]
+    : results;
 
-  function runTeleportationTest() {
-    const newCircuit = testQuantumTeleportation();
-    setCircuit(newCircuit.circuit);
-    console.log('Teleportation test result:', newCircuit.circuit.stateAsString(true));
-  }
+  const formatAngle = (angle) => {
+    return typeof angle === 'number' ? angle.toFixed(4) : 'N/A';
+  };
 
   return (
     <div className="quantum-teleportation-demo">
-      <h2>Quantum Teleportation for Beginners</h2>
-      <div id="drawing"></div>
-      <div className="quantum-visualization">
-        {renderQubit(step >= 1 ? 'active' : '', "Alice's Qubit")}
-        {renderQubit(step >= 2 ? 'entangled' : '', "Alice's Entangled Qubit")}
-        {renderQubit(step >= 2 ? 'entangled' : '', "Bob's Qubit")}
+      <h2>Quantum Teleportation Experiment</h2>
+      <p>
+        In this experiment, we teleport a qubit state prepared with a random U gate.
+        After teleportation, we apply the inverse of the U gate. If teleportation
+        is successful, the final measurement should always be 0.
+      </p>
+      <div ref={svgContainerRef} className="circuit-diagram"></div>
+      <div>
+        <TextField
+          label="Number of repetitions"
+          type="number"
+          value={repetitions}
+          onChange={(e) => setRepetitions(Math.max(1, parseInt(e.target.value)))}
+          inputProps={{ min: "1" }}
+          variant="outlined"
+          margin="normal"
+        />
       </div>
-      <div className="step-description">
-        <p>{steps[step]}</p>
-      </div>
-      <button onClick={handleNextStep} disabled={teleportationComplete}>
-        {teleportationComplete ? 'Teleportation Complete!' : 'Next Step'}
-      </button>
-      <button onClick={runTeleportationTest}>Run Teleportation Test</button>
-      {teleportationComplete && (
-        <div className="celebration">
-          🎉 Congratulations! You&apos;ve just witnessed quantum teleportation! 🎉
+      <Button variant="contained" color="primary" onClick={runTeleportation}>
+        Run Teleportation
+      </Button>
+      {results.length > 0 && (
+        <div>
+          <h3>Results:</h3>
+          <TableContainer component={Paper}>
+            <Table aria-label="teleportation results">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Run</TableCell>
+                  <TableCell>Result</TableCell>
+                  <TableCell>U3</TableCell>
+                  <TableCell>U3 Inverse</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {displayResults.map(({ id, result, u3, u3Inverse }) => (
+                  <TableRow key={id}>
+                    <TableCell>{id}</TableCell>
+                    <TableCell>{result}</TableCell>
+                    <TableCell>[{u3.map(formatAngle).join(', ')}]</TableCell>
+                    <TableCell>[{u3Inverse.map(formatAngle).join(', ')}]</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <p>Successful teleportations: {results.filter(r => r.result === 0).length}</p>
+          <p>Failed teleportations: {results.filter(r => r.result === 1).length}</p>
+          <p>Success rate: {((results.filter(r => r.result === 0).length / results.length) * 100).toFixed(2)}%</p>
         </div>
       )}
     </div>

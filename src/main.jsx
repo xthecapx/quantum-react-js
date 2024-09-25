@@ -1,35 +1,53 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import Charts from './Charts.jsx';
 import { createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import './index.css';
-import PercentIcon from '@mui/icons-material/Percent';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import HomeIcon from '@mui/icons-material/Home';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import CHSH from './CHSH.jsx';
+import Charts from './Charts.jsx';
 import QuantumTeleportationDemo from './QuantumTeleportationDemo.jsx';
 import ComparisonChart from './ComparisonChart.jsx';
+
+// Import icons
+import HomeIcon from '@mui/icons-material/Home';
+import FolderIcon from '@mui/icons-material/Folder';
+import DescriptionIcon from '@mui/icons-material/Description';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import CompareIcon from '@mui/icons-material/Compare';
+import ScienceIcon from '@mui/icons-material/Science';
+
+// Create a Home component
+const Home = () => (
+  <div>
+    <h1>Welcome to Quantum Playground</h1>
+    <p>This is an app to play with quantum concepts and experiments. Explore the different sections to learn about CHSH games, quantum teleportation, and more!</p>
+  </div>
+);
 
 const router = createHashRouter([
   {
     path: '/',
+    element: <Home />,
+  },
+  {
+    path: '/chsh',
     element: <CHSH />,
   },
   {
-    path: '/charts',
+    path: '/chsh/charts',
     element: <Charts />,
+  },
+  {
+    path: '/chsh/comparison',
+    element: <ComparisonChart />,
   },
   {
     path: '/quantum-teleportation',
     element: <QuantumTeleportationDemo />,
   },
-  {
-    path: '/comparison',
-    element: <ComparisonChart />,
-  }
 ]);
 
 const darkTheme = createTheme({
@@ -49,20 +67,40 @@ const NAVIGATION = [
     icon: <HomeIcon />,
   },
   {
-    segment: 'charts',
-    title: 'Charts',
-    icon: <PercentIcon />,
+    segment: 'chsh',
+    title: 'CHSH Experiment',
+    icon: <FolderIcon />,
+    children: [
+      {
+        segment: '',
+        title: 'CHSH Game',
+        icon: <DescriptionIcon />,
+      },
+      {
+        segment: 'charts',
+        title: 'Strategy Charts',
+        icon: <BarChartIcon />,
+      },
+      {
+        segment: 'comparison',
+        title: 'Strategy Comparison',
+        icon: <CompareIcon />,
+      },
+    ],
   },
   {
     segment: 'quantum-teleportation',
     title: 'Quantum Teleportation',
-    icon: <PercentIcon />,
+    icon: <FolderIcon />,
+    children: [
+      {
+        segment: '',
+        title: 'Experiment',
+        icon: <ScienceIcon />,
+      },
+    ]
   },
-  {
-    segment: 'comparison',
-    title: 'Comparison',
-    icon: <PercentIcon />,
-  },
+  
 ];
 
 createRoot(document.getElementById('root')).render(
@@ -72,7 +110,7 @@ createRoot(document.getElementById('root')).render(
       router={router}
       theme={darkTheme}
       window={window !== undefined ? window : undefined}
-      >
+    >
       <DashboardLayout>
         <CssBaseline />
         <RouterProvider router={router} />

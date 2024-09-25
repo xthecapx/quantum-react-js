@@ -132,7 +132,7 @@ function Charts() {
           },
         ]}
       >
-        <ChartsAxisHighlight x="wins" />
+        <ChartsAxisHighlight x="line" /> {/* Changed from x="wins" to x="line" */}
         <BarPlot />
         <LinePlot />
         <LineHighlightPlot />

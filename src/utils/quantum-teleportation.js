@@ -20,13 +20,13 @@ export function createQuantumTeleportationCircuit(initialGate) {
   circuit.addMeasure(1, 'c1', 1);
 
   // Bob's operations (conditional on measurement results)
-  circuit.appendGate('cz', [1, 2], {
+  circuit.appendGate('cx', [1, 2], {
     condition: {
       creg: 'c0',
       value: 1
     }
   });
-  circuit.appendGate('cx', [0, 2], {
+  circuit.appendGate('cz', [0, 2], {
     condition: {
       creg: 'c1',
       value: 1
@@ -37,27 +37,24 @@ export function createQuantumTeleportationCircuit(initialGate) {
 }
 
 export function testQuantumTeleportation() {
-
-  
   // Generate random angles for the U gate
   const theta = Math.random() * 2 * Math.PI;
   const phi = Math.random() * 2 * Math.PI;
   const lambda = Math.random() * 2 * Math.PI;
+  const u3 = [theta, phi, lambda];
+  const u3Inverse = [-theta, -lambda, -phi];
 
   const circuit = createQuantumTeleportationCircuit((circuit) => {
-    /* circuit.appendGate('u3', 0, {
-      params: [theta, phi, lambda]
-    }); */
-    circuit.appendGate('x', 0);
+    circuit.appendGate('u3', 0, {
+      params: u3
+    });
   });
-  
-  circuit.addMeasure(2, 'c2', 2)
-  
 
-  circuit.run();
+  circuit.appendGate('u3', 2, {
+    params: u3Inverse
+  });
 
-  return {
-    angles: { theta, phi, lambda },
-    circuit: circuit
-  };
+  circuit.addMeasure(2, 'c2', 2);
+
+  return { circuit, angles: { u3, u3Inverse } };
 }
