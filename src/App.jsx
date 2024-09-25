@@ -64,7 +64,7 @@ function App() {
             justifyContent="center"
             alignItems="center"
           >
-            <h1>Quantum game</h1>
+            <h1>Quantum CHSH game</h1>
           </Grid>
         </Grid>
       </Box>
