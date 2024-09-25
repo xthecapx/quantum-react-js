@@ -135,7 +135,7 @@ function App() {
             } = availableStrategies;
             const { totalScore, gamesWon } = runGame(
               1000,
-              classicalAZeroStrategy
+              quantumStrategy
             );
             setResults((result) => {
               return [...result, { gamesWon, date: new Date() }];
