@@ -13,12 +13,15 @@ import { ChartsAxisHighlight } from '@mui/x-charts/ChartsAxisHighlight';
 import { axisClasses } from '@mui/x-charts/ChartsAxis';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid2';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 
 import './App.css';
 
 function Charts() {
   const [count, setCount] = useState(0);
   const [results, setResults] = useState([]);
+  const [selectedStrategy, setSelectedStrategy] = useState('quantum');
+
   const mean =
     results.reduce((acc, current) => acc + current.gamesWon, 0) /
     results.length;
@@ -42,29 +45,67 @@ function Charts() {
 
   return (
     <>
-      <Box sx={{ flexGrow: 1 }}>
-        <Grid container spacing={2}>
-          <Grid
-            size="auto"
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <a href="https://react.dev" target="_blank">
-              <img
-                src={reactLogo}
-                className="logo react logo-spin"
-                alt="React logo"
-              />
-            </a>
+      <Box sx={{ flexGrow: 1, marginBottom: 2 }}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid>
+            <FormControl sx={{ minWidth: 200 }}>
+              <InputLabel id="strategy-select-label">Strategy</InputLabel>
+              <Select
+                labelId="strategy-select-label"
+                id="strategy-select"
+                value={selectedStrategy}
+                label="Strategy"
+                onChange={(e) => setSelectedStrategy(e.target.value)}
+              >
+                <MenuItem value="quantum">Quantum Strategy</MenuItem>
+                <MenuItem value="classicalAZero">Classical A-Zero Strategy</MenuItem>
+                <MenuItem value="classicalRandom">Classical Random Strategy</MenuItem>
+                <MenuItem value="classicalProbabilistic">Classical Probabilistic Strategy</MenuItem>
+              </Select>
+            </FormControl>
           </Grid>
-          <Grid
-            size="grow"
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <h1>Quantum CHSH game</h1>
+          <Grid>
+            <button
+              onClick={() => {
+                const {
+                  classicalAZeroStrategy,
+                  classicalRandomStrategy,
+                  classicalProbabilisticStrategy,
+                } = availableStrategies;
+                let strategy;
+                switch (selectedStrategy) {
+                  case 'classicalAZero':
+                    strategy = classicalAZeroStrategy;
+                    break;
+                  case 'classicalRandom':
+                    strategy = classicalRandomStrategy;
+                    break;
+                  case 'classicalProbabilistic':
+                    strategy = classicalProbabilisticStrategy;
+                    break;
+                  default:
+                    strategy = quantumStrategy;
+                }
+                const { gamesWon } = runGame(1000, strategy);
+                setResults((prevResults) => [
+                  ...prevResults,
+                  { gamesWon, date: new Date() },
+                ]);
+                setCount((prevCount) => prevCount + 1);
+              }}
+            >
+              New Game {count}
+            </button>
+          </Grid>
+          <Grid>
+            <button
+              onClick={() => {
+                setResults([]);
+                setCount(0);
+              }}
+            >
+              Reset Results
+            </button>
           </Grid>
         </Grid>
       </Box>
