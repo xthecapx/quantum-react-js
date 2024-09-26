@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { testQuantumTeleportation } from './utils/quantum-teleportation';
 import { 
   Table, 
   TableBody, 
@@ -11,19 +10,13 @@ import {
   Button,
   TextField
 } from '@mui/material';
+import { useQuantumTeleportation } from './hooks/useQuantumTeleportation';
 
 const QuantumTeleportationDemo = () => {
+  const { circuit, angles, fields, append, remove, register, handleSubmit, onSubmit } = useQuantumTeleportation();
   const [repetitions, setRepetitions] = useState(1);
   const [results, setResults] = useState([]);
-  const [circuit, setCircuit] = useState(null);
-  const [angles, setAngles] = useState(null);
   const svgContainerRef = useRef(null);
-
-  useEffect(() => {
-    const { circuit: newCircuit, angles: newAngles } = testQuantumTeleportation();
-    setCircuit(newCircuit);
-    setAngles(newAngles);
-  }, []);
 
   useEffect(() => {
     if (circuit && svgContainerRef.current) {
@@ -34,15 +27,15 @@ const QuantumTeleportationDemo = () => {
   }, [circuit]);
 
   const runTeleportation = () => {
+    if (!circuit) return;
     const newResults = [];
     for (let i = 0; i < repetitions; i++) {
-      const { circuit: newCircuit, angles: newAngles } = testQuantumTeleportation();
-      newCircuit.run();
+      circuit.run();
       newResults.push({
         id: i + 1,
-        result: newCircuit.getCregBit('c2', 0),
-        u3: newAngles.u3,
-        u3Inverse: newAngles.u3Inverse
+        result: circuit.getCregBit('c2', 0),
+        u3: angles.u3,
+        u3Inverse: angles.u3Inverse
       });
     }
     setResults(newResults);
@@ -52,10 +45,6 @@ const QuantumTeleportationDemo = () => {
     ? [...results.slice(0, 5), { id: '...', result: '...', u3: ['...', '...', '...'], u3Inverse: ['...', '...', '...'] }, ...results.slice(-5)]
     : results;
 
-  const formatAngle = (angle) => {
-    return typeof angle === 'number' ? angle.toFixed(4) : 'N/A';
-  };
-
   return (
     <div className="quantum-teleportation-demo">
       <h2>Quantum Teleportation Experiment</h2>
@@ -64,14 +53,33 @@ const QuantumTeleportationDemo = () => {
         After teleportation, we apply the inverse of the U gate. If teleportation
         is successful, the final measurement should always be 0.
       </p>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {fields.map((field, index) => (
+          <div key={field.id}>
+            <TextField
+              {...register(`u3Gates.${index}.theta`)}
+              label="Theta"
+            />
+            <TextField
+              {...register(`u3Gates.${index}.phi`)}
+              label="Phi"
+            />
+            <TextField
+              {...register(`u3Gates.${index}.lambda`)}
+              label="Lambda"
+            />
+            <Button onClick={() => remove(index)}>Remove</Button>
+          </div>
+        ))}
+        <Button color="secondary" variant="contained" type="button" onClick={() => append({ theta:(Math.random() * 2 * Math.PI).toFixed(2), phi:(Math.random() * 2 * Math.PI).toFixed(2), lambda:(Math.random() * 2 * Math.PI).toFixed(2) })}>Add U3 Gate</Button>
+        <Button color="primary" type="submit" variant="contained">Update Circuit</Button>
+      </form>
       <div ref={svgContainerRef} className="circuit-diagram"></div>
       <div>
         <TextField
           label="Number of repetitions"
-          type="number"
           value={repetitions}
           onChange={(e) => setRepetitions(Math.max(1, parseInt(e.target.value)))}
-          inputProps={{ min: "1" }}
           variant="outlined"
           margin="normal"
         />
@@ -97,8 +105,8 @@ const QuantumTeleportationDemo = () => {
                   <TableRow key={id}>
                     <TableCell>{id}</TableCell>
                     <TableCell>{result}</TableCell>
-                    <TableCell>[{u3.map(formatAngle).join(', ')}]</TableCell>
-                    <TableCell>[{u3Inverse.map(formatAngle).join(', ')}]</TableCell>
+                    <TableCell>[{u3.join(', ')}]</TableCell>
+                    <TableCell>[{u3Inverse.join(', ')}]</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

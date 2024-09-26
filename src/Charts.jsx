@@ -9,6 +9,7 @@ import { ChartsXAxis } from '@mui/x-charts/ChartsXAxis';
 import { ChartsYAxis } from '@mui/x-charts/ChartsYAxis';
 import { ChartsTooltip } from '@mui/x-charts/ChartsTooltip';
 import { ChartsAxisHighlight } from '@mui/x-charts/ChartsAxisHighlight';
+import Button from '@mui/material/Button';
 import { axisClasses } from '@mui/x-charts/ChartsAxis';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid2';
@@ -74,7 +75,10 @@ function Charts() {
           </FormControl>
         </Grid>
         <Grid>
-          <button
+          <Button
+            type="button"
+            color="primary"
+            variant="contained"
             onClick={() => {
               const strategy = strategyMap[selectedStrategy];
               const { gamesWon } = runGame(1000, strategy);
@@ -86,17 +90,19 @@ function Charts() {
             }}
           >
             New Game {count}
-          </button>
+          </Button>
         </Grid>
         <Grid>
-          <button
+          <Button
+            variant="contained"
+            color="secondary"
             onClick={() => {
               setResults([]);
               setCount(0);
             }}
           >
             Reset Results
-          </button>
+          </Button>
         </Grid>
       </Grid>
       {results.length > 0 && meanArray.length > 0 && (

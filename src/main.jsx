@@ -2,7 +2,6 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import './index.css';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
@@ -96,13 +95,13 @@ const NAVIGATION = [
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
+    <CssBaseline />
     <AppProvider
       navigation={NAVIGATION}
       router={router}
       theme={darkTheme}
     >
       <DashboardLayout>
-        <CssBaseline />
         <RouterProvider router={router} />
       </DashboardLayout>
     </AppProvider>
