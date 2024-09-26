@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -10,6 +10,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { generateQuestions, validateGame } from './utils/game.js';
+import { Tooltip } from '@mui/material';
+import Joyride from 'react-joyride';
 
 function CHSH() {
   const [a, setA] = useState(null);
@@ -17,6 +19,39 @@ function CHSH() {
   const [x, setX] = useState(null);
   const [y, setY] = useState(null);
   const [status, setStatus] = useState('waiting');
+  const [runTour, setRunTour] = useState(false);
+
+  useEffect(() => {
+    setRunTour(true);
+  }, []);
+
+  const steps = [
+    {
+      target: '.winning-criteria',
+      content: 'First, read the winning criteria to understand the game rules.',
+      placement: 'top',
+    },
+    {
+      target: '.referee',
+      content: 'Click on the referee to generate questions for players A and B.',
+      placement: 'left',
+    },
+    {
+      target: '.player-a',
+      content: 'Click on player A to generate their answer.',
+      placement: 'right',
+    },
+    {
+      target: '.player-b',
+      content: 'Click on player B to generate their answer.',
+      placement: 'right',
+    },
+    {
+      target: '.check-result',
+      content: 'Finally, click here to check the result of the game.',
+      placement: 'top',
+    },
+  ];
 
   const handleA = () => {
     if (x !== null) setA(a === 1 ? 0 : 1);
@@ -50,6 +85,20 @@ function CHSH() {
 
   return (
     <Box sx={{ width: '100%', maxWidth: 800, margin: 'auto', textAlign: 'center' }}>
+      <Joyride
+        continuous
+        run={runTour}
+        scrollToFirstStep
+        showProgress
+        showSkipButton
+        steps={steps}
+        styles={{
+          options: {
+            zIndex: 10000,
+          },
+        }}
+      />  
+
       <Typography variant="h4" gutterBottom>
         CHSH Game: {status}
       </Typography>
@@ -58,36 +107,45 @@ function CHSH() {
         <rect width="700" height="400" fill="white" />
 
         {/* Player A */}
-        <circle 
-          cx="100" cy="100" r="40" 
-          fill={a === null ? 'lightgray' : (a === 1 ? 'blue' : 'red')}
-          onClick={handleA}
-          style={{cursor: x !== null ? 'pointer' : 'default'}}
-        />
+        <Tooltip title="Click to set player A's answer" placement="right">
+          <circle 
+            className="player-a"
+            cx="100" cy="100" r="40" 
+            fill={a === null ? 'lightgray' : (a === 1 ? 'blue' : 'red')}
+            onClick={handleA}
+            style={{cursor: x !== null ? 'pointer' : 'default'}}
+          />
+        </Tooltip>
         <text x="100" y="105" textAnchor="middle" fill="white" fontSize="20">A</text>
         {a !== null && (
           <text x="160" y="105" textAnchor="start" fill="black" fontSize="16">a = {a}</text>
         )}
 
         {/* Player B */}
-        <circle 
-          cx="100" cy="300" r="40" 
-          fill={b === null ? 'lightgray' : (b === 1 ? 'blue' : 'red')}
-          onClick={handleB}
-          style={{cursor: y !== null ? 'pointer' : 'default'}}
-        />
+        <Tooltip title="Click to set player B's answer" placement="right">
+          <circle 
+            className="player-b"
+            cx="100" cy="300" r="40" 
+            fill={b === null ? 'lightgray' : (b === 1 ? 'blue' : 'red')}
+            onClick={handleB}
+            style={{cursor: y !== null ? 'pointer' : 'default'}}
+          />
+        </Tooltip>
         <text x="100" y="305" textAnchor="middle" fill="white" fontSize="20">B</text>
         {b !== null && (
           <text x="160" y="305" textAnchor="start" fill="black" fontSize="16">b = {b}</text>
         )}
 
         {/* Referee */}
-        <circle 
-          cx="600" cy="200" r="40" 
-          fill="green" 
-          onClick={generateQuestion}
-          style={{cursor: 'pointer'}}
-        />
+        <Tooltip title="Click to generate questions" placement="left">
+          <circle 
+            className="referee"
+            cx="600" cy="200" r="40" 
+            fill="green" 
+            onClick={generateQuestion}
+            style={{cursor: 'pointer'}}
+          />
+        </Tooltip>
         <text x="600" y="205" textAnchor="middle" fill="white" fontSize="20">R</text>
 
         {/* Arrows and labels */}
@@ -119,15 +177,20 @@ function CHSH() {
       </svg>
 
       <Box sx={{ mt: 2 }}>
-        <Button 
-          variant="contained" 
-          color="success" 
-          onClick={checkResult} 
-          disabled={a === null || b === null}
-          sx={{ mr: 2 }}
-        >
-          Check Result
-        </Button>
+        <Tooltip title="Check the result of the game" placement="top">
+          <span>
+            <Button 
+              className="check-result"
+              variant="contained" 
+              color="success" 
+              onClick={checkResult} 
+              disabled={a === null || b === null}
+              sx={{ mr: 2 }}
+            >
+              Check Result
+            </Button>
+          </span>
+        </Tooltip>
         <Button 
           variant="contained" 
           color="secondary" 
@@ -144,7 +207,7 @@ function CHSH() {
         Your Choices: a = {a}, b = {b}
       </Typography>
 
-      <Typography variant="h6" sx={{ mt: 4, mb: 2 }}>
+      <Typography variant="h6" sx={{ mt: 4, mb: 2 }} className="winning-criteria">
         Winning Criteria
       </Typography>
       <TableContainer component={Paper}>
