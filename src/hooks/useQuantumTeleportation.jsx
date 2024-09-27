@@ -1,16 +1,18 @@
+import QuantumCircuit from 'quantum-circuit';
 import { useState, useCallback, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
-import { createQuantumTeleportationCircuit } from "../utils/quantum-teleportation";
+import { AlliceObservation, AlliceSendMessage, AliceAndBobEntanglement, RandomAllicePayload, BobVerification, BobReceiveMessage } from "../utils/quantum-teleportation";
 
 export const initialAngles = {
-  theta:(Math.random() * 2 * Math.PI).toFixed(2),
-  phi:(Math.random() * 2 * Math.PI).toFixed(2),
-  lambda:(Math.random() * 2 * Math.PI).toFixed(2)
+  theta: (Math.random() * 2 * Math.PI).toFixed(2),
+  phi: (Math.random() * 2 * Math.PI).toFixed(2),
+  lambda: (Math.random() * 2 * Math.PI).toFixed(2)
 };
 
 export const useQuantumTeleportation = () => {
   const [circuit, setCircuit] = useState(null);
-  const [angles, setAngles] = useState(null);
+  const [repetitions, setRepetitions] = useState(1);
+  const [results, setResults] = useState([]);
 
   const { register, control, handleSubmit, getValues } = useForm({
     defaultValues: {
@@ -24,24 +26,38 @@ export const useQuantumTeleportation = () => {
   });
 
   const updateCircuit = useCallback((data) => {
-    const u3 = data.u3Gates.map(gate => [gate.theta, gate.phi, gate.lambda]);
-    const u3Inverse = u3.map(([theta, phi, lambda]) => [-theta, -lambda, -phi]);
+    const circuit = new QuantumCircuit(3);
 
-    const newCircuit = createQuantumTeleportationCircuit((circuit) => {
-      u3.forEach(params => {
-        circuit.appendGate('u3', 0, { params });
+    // Alice's circuit
+    const entanglement = AliceAndBobEntanglement(circuit);
+    const payload = RandomAllicePayload(entanglement, data.u3Gates);
+    const message = AlliceSendMessage(payload);
+    const observation = AlliceObservation(message);
+
+    // Bob's circuit
+    const BobDecodeMessageCircuit = BobReceiveMessage(observation)
+    const BobVerificationCircuit = BobVerification(BobDecodeMessageCircuit, data.u3Gates);
+
+    setCircuit(BobVerificationCircuit);
+  }, [setCircuit]);
+
+  const runTeleportation = () => {
+    if (!circuit) return;
+    const newResults = [];
+    for (let i = 0; i < repetitions; i++) {
+      circuit.run();
+      newResults.push({
+        id: i + 1,
+        probabilities: circuit.probabilities(),
+        cregsAsString: circuit.cregsAsString(),
+        confirmation: circuit.getCregBit('confirmation', 2),
+        wire0: circuit.getCregBit('wire0', 0),
+        wire1: circuit.getCregBit('wire1', 1),
+        circuitPrint: circuit.stateAsString(true)
       });
-    });
-
-    u3Inverse.reverse().forEach(params => {
-      newCircuit.appendGate('u3', 2, { params });
-    });
-
-    newCircuit.addMeasure(2, 'c2', 2);
-
-    setCircuit(newCircuit);
-    setAngles({ u3, u3Inverse });
-  }, [setCircuit, setAngles]);
+    }
+    setResults(newResults);
+  };
 
   const onSubmit = (data) => {
     updateCircuit(data);
@@ -51,5 +67,5 @@ export const useQuantumTeleportation = () => {
     updateCircuit(getValues());
   }, [updateCircuit, getValues]);
 
-  return { circuit, angles, fields, append, remove, register, handleSubmit, onSubmit };
+  return { circuit, fields, append, results, repetitions, setRepetitions, runTeleportation, remove, register, handleSubmit, onSubmit };
 };
