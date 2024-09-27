@@ -1,34 +1,47 @@
 import QuantumCircuit from 'quantum-circuit';
 
-export function createQuantumTeleportationCircuit(initialGate) {
+export function AliceAndBobEntanglement() {
   const circuit = new QuantumCircuit(3);
 
-  if(initialGate) {
-    initialGate(circuit);
-  }
-
-  // Prepare the entangled state (Bell state) between qubits 1 and 2
   circuit.appendGate('h', 1);
   circuit.appendGate('cx', [1, 2]);
 
-  // Alice's operations
+  return circuit;
+}
+
+export function RandomAllicePayload(circuit, angles) {
+  angles.forEach(params => {
+    circuit.appendGate('u3', 0, { params: [params.theta, params.phi, params.lambda] });
+  });
+
+  return circuit;
+}
+
+export function AlliceSendMessage(circuit) {
   circuit.appendGate('cx', [0, 1]);
   circuit.appendGate('h', 0);
 
-  // Measure qubits 0 and 1
-  circuit.addMeasure(0, 'c0', 0);
-  circuit.addMeasure(1, 'c1', 1);
+  return circuit;
+}
 
-  // Bob's operations (conditional on measurement results)
-  circuit.appendGate('cx', [1, 2], {
+export function AlliceObservation(circuit) {
+  circuit.addMeasure(1, 'wire1', 1);
+  circuit.addMeasure(0, 'wire0', 0);
+  // circuit.run();
+
+  return circuit;
+}
+
+export function BobReceiveMessage(circuit) {
+  circuit.appendGate('x', 2, {
     condition: {
-      creg: 'c0',
+      creg: 'wire1',
       value: 1
     }
   });
-  circuit.appendGate('cz', [0, 2], {
+  circuit.appendGate('z', 2, {
     condition: {
-      creg: 'c1',
+      creg: 'wire0',
       value: 1
     }
   });
@@ -36,25 +49,12 @@ export function createQuantumTeleportationCircuit(initialGate) {
   return circuit;
 }
 
-export function testQuantumTeleportation() {
-  // Generate random angles for the U gate
-  const theta = Math.random() * 2 * Math.PI;
-  const phi = Math.random() * 2 * Math.PI;
-  const lambda = Math.random() * 2 * Math.PI;
-  const u3 = [theta, phi, lambda];
-  const u3Inverse = [-theta, -lambda, -phi];
-
-  const circuit = createQuantumTeleportationCircuit((circuit) => {
-    circuit.appendGate('u3', 0, {
-      params: u3
-    });
+export function BobVerification(circuit, angles) {
+  angles.reverse().forEach(params => {
+    circuit.appendGate('u3', 2, { params: [-params.theta, -params.lambda, -params.phi] });
   });
 
-  circuit.appendGate('u3', 2, {
-    params: u3Inverse
-  });
+  circuit.addMeasure(2, 'confirmation', 2);
 
-  circuit.addMeasure(2, 'c2', 2);
-
-  return { circuit, angles: { u3, u3Inverse } };
+  return circuit;
 }

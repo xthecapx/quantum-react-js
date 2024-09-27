@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { 
   Table, 
   TableBody, 
@@ -13,36 +13,34 @@ import {
 import { useQuantumTeleportation } from './hooks/useQuantumTeleportation';
 
 const QuantumTeleportationDemo = () => {
-  const { circuit, angles, fields, append, remove, register, handleSubmit, onSubmit } = useQuantumTeleportation();
-  const [repetitions, setRepetitions] = useState(1);
-  const [results, setResults] = useState([]);
+  const { circuit, runTeleportation, results, repetitions, setRepetitions,fields, append, remove, register, handleSubmit, onSubmit } = useQuantumTeleportation();
   const svgContainerRef = useRef(null);
 
-  useEffect(() => {
+  const drawCircuit = (circuit) => {
     if (circuit && svgContainerRef.current) {
       const svg = circuit.exportSVG(true);
       const svgWithBackground = svg.replace('<svg', '<svg style="background-color: white;"');
       svgContainerRef.current.innerHTML = svgWithBackground;
     }
+  }
+
+  useEffect(() => {
+    drawCircuit(circuit);
   }, [circuit]);
 
-  const runTeleportation = () => {
-    if (!circuit) return;
-    const newResults = [];
-    for (let i = 0; i < repetitions; i++) {
-      circuit.run();
-      newResults.push({
-        id: i + 1,
-        result: circuit.getCregBit('c2', 0),
-        u3: angles.u3,
-        u3Inverse: angles.u3Inverse
-      });
-    }
-    setResults(newResults);
-  };
-
   const displayResults = results.length > 10
-    ? [...results.slice(0, 5), { id: '...', result: '...', u3: ['...', '...', '...'], u3Inverse: ['...', '...', '...'] }, ...results.slice(-5)]
+    ? [
+        ...results.slice(0, 5), 
+        { 
+          id: '...', 
+          result: ['...', '...', '...'],
+          u3: ['...', '...', '...'], 
+          u3Inverse: ['...', '...', '...'], 
+          cregsAsString: '...', 
+          confirmation: '...' 
+        }, 
+        ...results.slice(-5)
+      ]
     : results;
 
   return (
@@ -95,26 +93,40 @@ const QuantumTeleportationDemo = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>Run</TableCell>
-                  <TableCell>Result</TableCell>
-                  <TableCell>U3</TableCell>
-                  <TableCell>U3 Inverse</TableCell>
+                  <TableCell>Confirmation</TableCell>
+                  <TableCell>Wire0</TableCell>
+                  <TableCell>Wire0</TableCell>
+                  <TableCell>Probabilities</TableCell>
+                  <TableCell>Circuit</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {displayResults.map(({ id, result, u3, u3Inverse }) => (
+                {displayResults.map(({ id, probabilities, wire0, wire1, circuitPrint, confirmation }) => (
                   <TableRow key={id}>
                     <TableCell>{id}</TableCell>
-                    <TableCell>{result}</TableCell>
-                    <TableCell>[{u3.join(', ')}]</TableCell>
-                    <TableCell>[{u3Inverse.join(', ')}]</TableCell>
+                    <TableCell>{confirmation}</TableCell>
+                    <TableCell>{wire0}</TableCell>
+                    <TableCell>{wire1}</TableCell>
+                    <TableCell>{probabilities ? probabilities.join(', ') : 'N/A'}</TableCell>
+                    <TableCell>
+                      {circuitPrint.split('\n').map((line, index) => {
+                        const [state, probability] = line.split('\t');
+                        return (
+                          <div key={index}>
+                            <span style={{ fontFamily: 'monospace' }}>{state}</span>
+                            <span style={{ marginLeft: '10px', color: 'gray' }}>{probability}</span>
+                          </div>
+                        );
+                      })}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
-          <p>Successful teleportations: {results.filter(r => r.result === 0).length}</p>
-          <p>Failed teleportations: {results.filter(r => r.result === 1).length}</p>
-          <p>Success rate: {((results.filter(r => r.result === 0).length / results.length) * 100).toFixed(2)}%</p>
+          <p>Successful teleportations: {results.filter(r => r.confirmation === 0).length}</p>
+          <p>Failed teleportations: {results.filter(r => r.confirmation === 1).length}</p>
+          <p>Success rate: {((results.filter(r => r.confirmation === 0).length / results.length) * 100).toFixed(2)}%</p>
         </div>
       )}
     </div>
