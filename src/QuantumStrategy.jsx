@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Tabs, Tab, Box, Button, Slider, Typography, TextField } from '@mui/material';
+import React, { useState, useEffect, useRef } from 'react';
+import { Tabs, Tab, Box, Button, Slider, Typography, TextField, Alert, Link } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { chshCircuit } from './utils/quantum-strategy';
 
 function SpinParticle({ degrees = 0, showArrow = false }) {
   const arrowStyle = {
@@ -260,6 +261,73 @@ function EntangledParticles() {
   );
 }
 
+function RealLifeExperiments() {
+  return (
+    <div>
+      <Typography variant="h4" gutterBottom>
+        Try It Yourself: Real-Life Quantum Experiments
+      </Typography>
+      <Typography variant="body1" paragraph>
+        While our simulations provide a great introduction to quantum concepts, nothing beats hands-on experience with real quantum equipment. If you're interested in conducting your own quantum experiments, there are commercial options available:
+      </Typography>
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="h6" gutterBottom>
+          1. qutools GmbH
+        </Typography>
+        <Typography variant="body1" paragraph>
+          qutools offers a range of quantum physics education kits and equipment, including interferometers and time-taggers.
+        </Typography>
+        <Link href="https://qutools.com/" target="_blank" rel="noopener noreferrer">
+          Visit qutools website
+        </Link>
+      </Box>
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="h6" gutterBottom>
+          2. ID Quantique
+        </Typography>
+        <Typography variant="body1" paragraph>
+          ID Quantique provides advanced quantum detection systems, including single-photon detectors and quantum random number generators.
+        </Typography>
+        <Link href="https://www.idquantique.com/quantum-detection-systems/overview/" target="_blank" rel="noopener noreferrer">
+          Explore ID Quantique's quantum detection systems
+        </Link>
+      </Box>
+      <Alert severity="warning" sx={{ mt: 2 }}>
+        Please note that professional quantum equipment can be expensive. However, the opportunity to conduct real quantum experiments and gain hands-on experience is invaluable for those seriously interested in quantum physics and technology.
+      </Alert>
+    </div>
+  );
+}
+
+function CHSHCircuitDemo() {
+  const svgContainerRef = useRef(null);
+
+  useEffect(() => {
+    const circuit = chshCircuit(0, 0); // Default values for x and y
+    drawCircuit(circuit);
+  }, []);
+
+  const drawCircuit = (circuit) => {
+    if (circuit && svgContainerRef.current) {
+      const svg = circuit.exportSVG(true);
+      const svgWithBackground = svg.replace('<svg', '<svg style="background-color: white;"');
+      svgContainerRef.current.innerHTML = svgWithBackground;
+    }
+  };
+
+  return (
+    <div>
+      <Typography variant="h4" gutterBottom>
+        CHSH Game Circuit
+      </Typography>
+      <Typography variant="body1" paragraph>
+        This is the quantum circuit used in the CHSH game strategy:
+      </Typography>
+      <div ref={svgContainerRef}></div>
+    </div>
+  );
+}
+
 function QuantumStrategy() {
   const [tabValue, setTabValue] = useState(0);
 
@@ -275,12 +343,16 @@ function QuantumStrategy() {
           <Tab label="Understanding Spin" />
           <Tab label="Measurement" />
           <Tab label="Entangled Particles" />
+          <Tab label="CHSH Circuit" />
+          <Tab label="Real-Life Experiments" />
         </Tabs>
       </Box>
       <Box sx={{ padding: 2 }}>
         {tabValue === 0 && <UnderstandingSpin />}
         {tabValue === 1 && <MeasurementDemo />}
         {tabValue === 2 && <EntangledParticles />}
+        {tabValue === 3 && <CHSHCircuitDemo />}
+        {tabValue === 4 && <RealLifeExperiments />}
       </Box>
     </div>
   );

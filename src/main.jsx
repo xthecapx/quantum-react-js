@@ -18,6 +18,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import CompareIcon from '@mui/icons-material/Compare';
 import ScienceIcon from '@mui/icons-material/Science';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import QuantumStrategy from './QuantumStrategy.jsx';
 
 const router = createHashRouter([
@@ -83,7 +84,7 @@ const NAVIGATION = [
       {
         segment: 'quantum-strategy',
         title: 'Quantum Strategy',
-        icon: <DescriptionIcon />,
+        icon: <AutoFixHighIcon />,
       },
     ],
   },
