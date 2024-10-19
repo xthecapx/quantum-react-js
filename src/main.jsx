@@ -18,7 +18,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import CompareIcon from '@mui/icons-material/Compare';
 import ScienceIcon from '@mui/icons-material/Science';
-
+import QuantumStrategy from './QuantumStrategy.jsx';
 
 const router = createHashRouter([
   {
@@ -38,6 +38,10 @@ const router = createHashRouter([
     element: <ComparisonChart />,
   },
   {
+    path: '/chsh/quantum-strategy',
+    element: <QuantumStrategy />,
+  },
+  {
     path: '/quantum-teleportation',
     element: <QuantumTeleportationDemo />,
   },
@@ -45,7 +49,7 @@ const router = createHashRouter([
 
 const darkTheme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: 'light',
   },
 });
 
@@ -75,6 +79,11 @@ const NAVIGATION = [
         segment: 'comparison',
         title: 'Strategy Comparison',
         icon: <CompareIcon />,
+      },
+      {
+        segment: 'quantum-strategy',
+        title: 'Quantum Strategy',
+        icon: <DescriptionIcon />,
       },
     ],
   },
